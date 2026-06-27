@@ -14,6 +14,9 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `main.c` — functional CGI binary. See README for feature list.
+- `policy/ast.rego` — 90% coverage gate, forbidden call gate,
+  unchecked strcmp result gate.
 - Initial release. Geek Code v3 decoder CGI — C99/kcgi, SVG badge grid, Da Planet design tokens.
 - `matrix_id.h` — net.matrix CMDB identity strings baked into binary at
   compile time. All survive `-O2`. Canonical owner: `main.c` (stub).
@@ -29,7 +32,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `.github/workflows/ci.yml` — test / sast / sbom / opa-gate pipeline.
   No containers job (panix CGI deploy, out of scope).
 - `.github/workflows/slsa.yml` — SLSA Level 3 provenance pipeline.
-- Full governance scaffold: BSD-2-Clause, CLAUDE.md, CONTRIBUTING.md,
+- `policy/ast.rego` — 90% coverage gate, forbidden call gate, unchecked strcmp gate.
+- Full governance scaffold: BSD-2-Clause, CLAUDE.md, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, SUPPORT.md, CODEOWNERS, issue templates.
   SECURITY.md, CODE_OF_CONDUCT.md, SUPPORT.md, CODEOWNERS, issue templates.
 
 ---

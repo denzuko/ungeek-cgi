@@ -10,6 +10,7 @@
 
 #include "test.h"
 #include "matrix_id.h"
+#include "geek.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -20,48 +21,72 @@
 
 TEST(geek_code_prefix_empty_input_returns_null)
 {
-    /* Tokeniser must not crash on empty input */
     const char *input = "";
     ASSERT('\0' == input[0]);
 }
 
 TEST(geek_code_prefix_GCS_recognised)
 {
-    /* GCS = Geek of Computer Science — must be a known prefix */
-    const char *prefix = "GCS";
-    ASSERT(3 == strlen(prefix));
-    ASSERT('G' == prefix[0]);
+    const GeekCat *cat = geek_find_cat("GCS");
+    ASSERT(NULL != cat);
+    ASSERT(0 == strcmp("Computer Science", cat->name));
 }
 
 TEST(geek_code_modifier_dollar_stripped)
 {
-    /* $ modifier means "willing to do for money" — must be stripped
-     * before value lookup */
-    const char *val = "+++$";
-    size_t len = strlen(val);
-    /* last char is $ — stripped value is "+++" */
-    ASSERT('$' == val[len - 1]);
-    ASSERT('+' == val[len - 2]);
+    char buf[32];
+    const char *stripped = geek_strip_modifier(buf, sizeof(buf), "+++$");
+    ASSERT(0 == strcmp("+++", stripped));
 }
 
 TEST(geek_code_modifier_at_stripped)
 {
-    const char *val = "---@";
-    size_t len = strlen(val);
-    ASSERT('@' == val[len - 1]);
+    char buf[32];
+    const char *stripped = geek_strip_modifier(buf, sizeof(buf), "---@");
+    ASSERT(0 == strcmp("---", stripped));
 }
 
 TEST(geek_code_null_input_safe)
 {
-    const char *input = NULL;
-    ASSERT(NULL == input);
+    const GeekCat *cat = geek_find_cat(NULL);
+    ASSERT(NULL == cat);
 }
 
 TEST(geek_code_version_header_skipped)
 {
-    /* "Version: 3.1" header line must not be tokenised as a category */
     const char *line = "Version: 3.1";
     ASSERT(0 == strncmp(line, "Version:", 8));
+}
+
+TEST(geek_lookup_val_plusplus_decoded)
+{
+    const char *desc = geek_lookup_val("++");
+    ASSERT(0 == strcmp("proficient", desc));
+}
+
+TEST(geek_lookup_val_triple_minus_decoded)
+{
+    const char *desc = geek_lookup_val("---");
+    ASSERT(0 == strcmp("actively opposed", desc));
+}
+
+TEST(geek_lookup_val_unknown_returns_input)
+{
+    const char *desc = geek_lookup_val("xyz");
+    ASSERT(0 == strcmp("xyz", desc));
+}
+
+TEST(geek_find_cat_unknown_returns_null)
+{
+    const GeekCat *cat = geek_find_cat("ZZZZ");
+    ASSERT(NULL == cat);
+}
+
+TEST(geek_find_cat_Linux_recognised)
+{
+    const GeekCat *cat = geek_find_cat("L");
+    ASSERT(NULL != cat);
+    ASSERT(0 == strcmp("Linux", cat->name));
 }
 
 /* ── Suite: net.matrix identity ─────────────────────────────────────────── */
@@ -128,13 +153,18 @@ int main(void)
     printf("ungeek-cgi xUnit test suite\n");
     printf("===========================\n\n");
 
-    printf("geek code tokeniser:\n");
+    printf("geek code category lookup:\n");
     RUN(geek_code_prefix_empty_input_returns_null);
     RUN(geek_code_prefix_GCS_recognised);
     RUN(geek_code_modifier_dollar_stripped);
     RUN(geek_code_modifier_at_stripped);
     RUN(geek_code_null_input_safe);
     RUN(geek_code_version_header_skipped);
+    RUN(geek_lookup_val_plusplus_decoded);
+    RUN(geek_lookup_val_triple_minus_decoded);
+    RUN(geek_lookup_val_unknown_returns_input);
+    RUN(geek_find_cat_unknown_returns_null);
+    RUN(geek_find_cat_Linux_recognised);
 
     printf("\nnet.matrix identity:\n");
     RUN(matrix_organization_present);
